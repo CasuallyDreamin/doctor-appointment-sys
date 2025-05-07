@@ -40,11 +40,31 @@ def doctor_panel():
     clear()
     print("This is the doctor panel")
     input("Enter to exit")
+    # Todo:
+
+    # register doctor 
+    #   {Take data} -> {Add to DS}
 
 def admin_panel():
     clear()
     print("This is the admin panel")
     input("Enter to exit")
+    # Todo:
+    
+    # See all doctors 
+    # {Get all doctors from DS} -> {Show}
+    
+    # Find doctor by national ID
+    # {Get national ID} -> {Get Doctor from DS} -> {Show}
+
+    # Find all doctors by speciality
+    # {Get speciality} -> {Get Doctors from DS} -> {Show}
+
+    # Add city support
+    # {Get City} -> {Add to DS}
+
+    # Add speciality support 
+    # {Get speciality} -> {Add to DS}
 
 def patient_panel():
     clear()
