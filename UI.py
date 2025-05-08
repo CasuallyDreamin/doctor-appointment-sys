@@ -5,6 +5,14 @@ from view_model import view_model
 
 vm = view_model()
 
+# todo: add data from test files
+
+with open("cities.txt") as f:
+    ...
+
+with open("specialities.txt") as f:
+    ...
+
 def UI():
     running = True
 
@@ -46,6 +54,7 @@ def doctor_panel():
     # register doctor
     # {Get doctor info from user} -> {Create doctor object} -> {Add to DS}
     if opt == 1:
+        # todo: validate input
         name         = input("name: ")
         family_name  = input("family name: ")
         national_id  = input("national id: ") 
@@ -72,9 +81,11 @@ def admin_panel():
     print(
 '''
 1. See all doctors
+2. Find doctor by national ID
+3. Filter by Speciality
 '''
     )
-    valid_options = [1]
+    valid_options = [1, 2, 3]
     opt = get_option(valid_options)
     
     # See all doctors
@@ -83,7 +94,7 @@ def admin_panel():
         curr_doc_node = vm.get_all_doctors().head
         
         print("name, family name, national ID , med ID, phone number, address, city, speciality")
-        
+
         while curr_doc_node != None:
             curr_doc:doctor = curr_doc_node.data
 
@@ -98,14 +109,54 @@ def admin_panel():
             
             curr_doc_node = curr_doc_node.next
 
-        input("Enter to return. ")
+        return input("Enter to return. ")
     
     # Find doctor by national ID
     # {Get national ID} -> {Get Doctor from DS} -> {Show}
+    elif opt == 2:
+        national_id = input("national id: ")
+        #todo: validate input
+        
+        doct = vm.get_by_national_id(national_id)
+        if doct == None:
+            input("Doctor not found. \nEnter to return. ")
+        else:
+            print("name: ", doct.name, ",\n",
+                  "family name: ", doct.family_name, ",\n",
+                  "national ID : ", doct.national_id, ",\n",
+                  "med ID: ", doct.med_id, ",\n",
+                  "phone number: ", doct.phone_number, ",\n",
+                  "address: ", doct.address, ",\n",
+                  "city: ", doct.city, ",\n",
+                  "specialtity: ", doct.speciality)
+            input("Enter to return.")
+        return
 
     # Find all doctors by speciality
     # {Get speciality} -> {Get Doctors from DS} -> {Show}
+    elif opt == 3:
+        speciality = input("national id: ")
+        docts = vm.get_by_speciality(speciality)
+        curr_doc_node = docts.head
+        if curr_doc_node == None:
+            input("no doctors found. \nEnter to return. ")
+        else:
+            while curr_doc_node != None:
+                curr_doc:doctor = curr_doc_node.data
 
+                print(curr_doc.name, ",",
+                    curr_doc.family_name, ",",
+                    curr_doc.national_id, ",",
+                    curr_doc.med_id, ",",
+                    curr_doc.phone_number, ",",
+                    curr_doc.address, ",",
+                    curr_doc.city, ",",
+                    curr_doc.speciality)
+                
+                curr_doc_node = curr_doc_node.next
+            
+            input("Enter to return.")
+        return
     # Add city support
     # {Get City} -> {Add to DS}
 

@@ -14,7 +14,6 @@ a platform to book and manage doctor appointments
     speciality - picked from list defined by admin
 
 ### admin panel
-
 #### See all doctors
 #### Find doctor by national ID
 #### Find all doctors by speciality
