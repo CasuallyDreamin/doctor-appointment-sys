@@ -86,6 +86,7 @@ def admin_panel():
         
         while curr_doc_node != None:
             curr_doc:doctor = curr_doc_node.data
+
             print(curr_doc.name, ",",
                   curr_doc.family_name, ",",
                   curr_doc.national_id, ",",
@@ -94,6 +95,7 @@ def admin_panel():
                   curr_doc.address, ",",
                   curr_doc.city, ",",
                   curr_doc.speciality)
+            
             curr_doc_node = curr_doc_node.next
 
         input("Enter to return. ")
