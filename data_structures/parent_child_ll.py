@@ -54,7 +54,6 @@ class parent_child_ll:
             parents.add_first(curr_parent.data)    
             curr_parent = curr_parent.next
                 
-            
 class parent_node(sll_node):
     def __init__(self, data):
         super().__init__(data)
