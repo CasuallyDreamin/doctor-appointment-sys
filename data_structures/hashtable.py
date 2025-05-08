@@ -54,11 +54,14 @@ class hashtable:
         return index**2 % self.size
     
     def expand(self):
-        old_arr = self.arr
+        old_arr = arr(self.size)
+
+        for i in range(old_arr.size):
+            data = self.arr.get(i)
+            old_arr.insert(i, data)
 
         self.size = self.size * 2
         self.occupied = 0
-
         self.arr = arr(self.size)
 
         for i in range(old_arr.size):
@@ -94,6 +97,7 @@ class hashtable:
             curr = self.arr.get(i)
             if curr != None:
                 all.add_last(curr.value)
+                
         
         return all
 
@@ -101,8 +105,3 @@ class key_value:
     def __init__(self, key, value):
         self.key = key
         self.value = value
-
-myht = hashtable()
-myht.insert(1,1)
-
-print(myht.get_all().head.data)

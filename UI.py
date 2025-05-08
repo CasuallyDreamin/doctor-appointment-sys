@@ -5,13 +5,33 @@ from view_model import view_model
 
 vm = view_model()
 
-# todo: add data from test files
+with open("Cities.txt","r") as f:
+    cities = [line.strip() for line in f.readlines()]
+    for city in cities:
+        vm.add_city(city)
 
-with open("cities.txt") as f:
-    ...
+with open("Specialties.txt", "r") as f:
+    specis = [line.strip() for line in f.readlines()]
+    for speci in specis:
+        vm.add_specialty(speci)
 
-with open("specialities.txt") as f:
-    ...
+with open("Doctors.txt","r") as f:
+    for line in f:
+        doc = line.strip().split("-")
+        new_doctor = doctor(
+        name         = doc[0],
+        family_name  = doc[1],
+        national_id  = int(doc[2]),
+        med_id       = int(doc[3]),
+        phone_number = int(doc[4]),
+        address      = doc[5],
+        city         = doc[6],
+        specialty    = doc[7],
+        password     = doc[8])
+    
+        if not vm.add_doctor(new_doctor):
+            exit("couldn't add a doctor")   
+
 
 def UI():
     running = True
@@ -54,16 +74,82 @@ def doctor_panel():
     # register doctor
     # {Get doctor info from user} -> {Create doctor object} -> {Add to DS}
     if opt == 1:
-        # todo: validate input
         name         = input("name: ")
         family_name  = input("family name: ")
-        national_id  = input("national id: ") 
-        med_id       = input("med id: ")
-        phone_number = input("phone number: ")
-        address      = input("address: ")
-        city         = input("city: ")
-        speciality   = input("specialiy: ")
         
+        while True:
+            national_id = input("national id: ")
+            try:
+                national_id = int(national_id)
+                break
+            except ValueError:
+                print("Invalid national id.")
+        
+        while True:
+            med_id = input("med id: ")
+            try:
+                med_id = int(med_id)
+                break
+            except ValueError:
+                print("Invalid med id.")
+        
+        while True:
+            phone_number = input("phone number: ")
+            try:
+                phone_number = int(phone_number)
+                break
+            except ValueError:
+                print("Invalid phone number.")
+    
+        address = input("address: ")
+        
+        invalid_city = True
+        
+        while invalid_city:
+            doc_city = input("city: ")
+            if doc_city == '0':
+                return
+            
+            curr_city = vm.get_all_cities().head
+            while curr_city != None:
+                if curr_city.data == doc_city:
+                    invalid_city = False
+                    break
+                curr_city = curr_city.next
+            
+            if not invalid_city:
+                break
+
+            print(f"{doc_city} is not a supported city\nSupported Cities:")
+            curr_city = vm.get_all_cities().head
+            while curr_city != None:
+                print(curr_city.data)
+                curr_city = curr_city.next
+
+        invalid_speci = True
+        while invalid_speci:
+            doc_specialty = input("specialty: ")
+            if doc_specialty == '0':
+                return
+            
+            curr_speci = vm.get_all_speci().head
+            while curr_speci != None:
+                if curr_speci.data == doc_specialty:
+                    invalid_speci = False
+                    break
+                curr_speci = curr_speci.next
+            
+            if not invalid_speci:
+                break
+
+            print(f"{doc_specialty} is not a supported specialty\nSupported Specialties:")
+            curr_speci = vm.get_all_speci().head
+            while curr_speci != None:
+                print(curr_speci.data)
+                curr_speci = curr_speci.next
+        
+        password = input("password")
+
         new_doctor = doctor(
             name         = name,
             family_name  = family_name,
@@ -71,8 +157,9 @@ def doctor_panel():
             med_id       = med_id,
             phone_number = phone_number,
             address      = address,
-            city         = city,
-            speciality   = speciality)
+            city         = doc_city,
+            specialty   = doc_specialty,
+            password     = password)
     
         vm.add_doctor(new_doctor)
 
@@ -93,7 +180,7 @@ def admin_panel():
     if opt == 1:
         curr_doc_node = vm.get_all_doctors().head
         
-        print("name, family name, national ID , med ID, phone number, address, city, speciality")
+        print("name, family name, national ID , med ID, phone number, address, city, specialty, password")
 
         while curr_doc_node != None:
             curr_doc:doctor = curr_doc_node.data
@@ -105,7 +192,8 @@ def admin_panel():
                   curr_doc.phone_number, ",",
                   curr_doc.address, ",",
                   curr_doc.city, ",",
-                  curr_doc.speciality)
+                  curr_doc.specialty, ",",
+                  curr_doc.password)
             
             curr_doc_node = curr_doc_node.next
 
@@ -114,29 +202,36 @@ def admin_panel():
     # Find doctor by national ID
     # {Get national ID} -> {Get Doctor from DS} -> {Show}
     elif opt == 2:
-        national_id = input("national id: ")
-        #todo: validate input
+        while True:
+            try:
+                national_id = int(input("national id: "))
+                if national_id == 0:
+                    return
+                break
+            except ValueError:
+                print("Invalid national ID")
         
         doct = vm.get_by_national_id(national_id)
+        
         if doct == None:
             input("Doctor not found. \nEnter to return. ")
         else:
-            print("name: ", doct.name, ",\n",
-                  "family name: ", doct.family_name, ",\n",
-                  "national ID : ", doct.national_id, ",\n",
-                  "med ID: ", doct.med_id, ",\n",
-                  "phone number: ", doct.phone_number, ",\n",
-                  "address: ", doct.address, ",\n",
-                  "city: ", doct.city, ",\n",
-                  "specialtity: ", doct.speciality)
+            print("name: ", doct.name, "\n",
+                  "family name: ", doct.family_name, "\n",
+                  "national ID : ", doct.national_id, "\n",
+                  "med ID: ", doct.med_id, "\n",
+                  "phone number: ", doct.phone_number, "\n",
+                  "address: ", doct.address, "\n",
+                  "city: ", doct.city, "\n",
+                  "specialty: ", doct.specialty, "\n")
             input("Enter to return.")
         return
 
-    # Find all doctors by speciality
-    # {Get speciality} -> {Get Doctors from DS} -> {Show}
+    # Find all doctors by specialty
+    # {Get specialty} -> {Get Doctors from DS} -> {Show}
     elif opt == 3:
-        speciality = input("national id: ")
-        docts = vm.get_by_speciality(speciality)
+        specialty = input("national id: ")
+        docts = vm.get_by_specialty(specialty)
         curr_doc_node = docts.head
         if curr_doc_node == None:
             input("no doctors found. \nEnter to return. ")
@@ -151,16 +246,17 @@ def admin_panel():
                     curr_doc.phone_number, ",",
                     curr_doc.address, ",",
                     curr_doc.city, ",",
-                    curr_doc.speciality)
+                    curr_doc.specialty, ",",
+                    curr_doc.password)
                 
                 curr_doc_node = curr_doc_node.next
             
             input("Enter to return.")
         return
-    # Add city support
+    # TODO: Add city support
     # {Get City} -> {Add to DS}
 
-    # Add speciality support 
+    # TODO: Add speciality support  
     # {Get speciality} -> {Add to DS}
 
 def patient_panel():

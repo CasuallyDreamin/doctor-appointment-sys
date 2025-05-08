@@ -46,13 +46,15 @@ class parent_child_ll:
         
         return empty_sll 
     
-    def get_parents(self):
+    def get_parents(self) -> sll:
         parents = sll()
         curr_parent = self.head
         
         while curr_parent != None:
             parents.add_first(curr_parent.data)    
             curr_parent = curr_parent.next
+        
+        return parents
                 
 class parent_node(sll_node):
     def __init__(self, data):

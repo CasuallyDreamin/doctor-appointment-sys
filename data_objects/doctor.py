@@ -7,7 +7,8 @@ class doctor:
         phone_number,
         address,
         city,
-        speciality):
+        specialty,
+        password):
         
         self.name = name
         self.family_name = family_name
@@ -16,4 +17,5 @@ class doctor:
         self.phone_number = phone_number
         self.address = address
         self.city = city
-        self.speciality = speciality
+        self.specialty = specialty
+        self.password = password

@@ -20,6 +20,7 @@ class sll:
             self.tail = new_node
         else:
             self.tail.next = new_node
+            self.tail = new_node
 
     
 
