@@ -13,7 +13,8 @@ a platform to book and manage doctor appointments
     city - picked from a list defined by admin
     speciality - picked from list defined by admin
 
-### admin panel 
+### admin panel
+
 #### See all doctors
 #### Find doctor by national ID
 #### Find all doctors by speciality
