@@ -5,17 +5,17 @@ from view_model import view_model
 
 vm = view_model()
 
-with open("Cities.txt","r") as f:
+with open("data_files/Cities.txt","r") as f:
     cities = [line.strip() for line in f.readlines()]
     for city in cities:
         vm.add_city(city)
 
-with open("Specialties.txt", "r") as f:
+with open("data_files/Specialties.txt", "r") as f:
     specis = [line.strip() for line in f.readlines()]
     for speci in specis:
         vm.add_specialty(speci)
 
-with open("Doctors.txt","r") as f:
+with open("data_files/Doctors.txt","r") as f:
     for line in f:
         doc = line.strip().split("-")
         new_doctor = doctor(
