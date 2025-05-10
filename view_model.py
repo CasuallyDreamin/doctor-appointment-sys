@@ -15,7 +15,7 @@ class view_model:
     def get_patient_by_national_id(self, national_id: int) -> patient:
         return self.patients.get_by_national_id(national_id)
 
-    def get_doctor_by_phone_number(self, phone_number: int) -> patient:
+    def get_patient_by_phone_number(self, phone_number: int) -> patient:
         return self.patients.get_by_phone_number(phone_number)
     
     # Doctor methods
