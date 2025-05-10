@@ -1,9 +1,11 @@
 from clear_screen import clear
 from sys import exit
 from data_objects.doctor import doctor
+from data_objects.patient import patient as pat
 from view_model import view_model
 
 vm = view_model()
+curr_user = None
 
 with open("data_files/Cities.txt","r") as f:
     cities = [line.strip() for line in f.readlines()]
@@ -32,6 +34,22 @@ with open("data_files/Doctors.txt","r") as f:
         if not vm.add_doctor(new_doctor):
             exit("couldn't add a doctor")   
 
+with open("data_files/Patients.txt","r") as f:
+    for line in f:
+        patient = line.strip().split("-")
+        new_patient = pat(
+        name             = patient[0],
+        family_name      = patient[1],
+        national_id      = int(patient[2]),
+        phone_number     = int(patient[3]),
+        password         = patient[4],
+        sex              = patient[5],
+        city             = patient[6],
+        insurance_number = patient[7])
+    
+        if not vm.add_patient(new_patient):
+            exit("couldn't add a patient")   
+
 
 def UI():
     running = True
@@ -44,6 +62,8 @@ def UI():
 
 def main_menu():
     clear()
+    if curr_user != None:
+        print(f"User:{curr_user.name} {curr_user.family_name}")
     print(
     """
 1. doctor panel
@@ -52,13 +72,14 @@ def main_menu():
 0. exit
     """)
     valid_options = [1,2,3,0]
-    
     opt = get_option(valid_options)
 
     if opt == 1: doctor_panel()
     elif opt == 2: admin_panel()
     elif opt == 3: patient_panel()
     elif opt == 0: 
+
+        #Update data files before exit
         with open("data_files/Cities.txt","w") as f:
             cities = vm.get_all_cities()
             curr_city = cities.head
@@ -74,7 +95,6 @@ def main_menu():
             while curr_speci != None:
                 f.write(f"{curr_speci.data}\n")
                 curr_speci = curr_speci.next
-
 
         with open("data_files/Doctors.txt","w") as f:
             doctors = vm.get_all_doctors()
@@ -93,12 +113,18 @@ def main_menu():
 
 def doctor_panel():
     clear()
+    
+    if curr_user != None:
+        print(f"User:{curr_user.name} {curr_user.family_name}")
     print(
 '''
+Doctors Panel
+
 1. register doctor
+2. login
 '''
     )
-    valid_options = [1]
+    valid_options = [1, 2]
     opt = get_option(valid_options)
     
     # register doctor
@@ -191,18 +217,38 @@ def doctor_panel():
             specialty   = doc_specialty,
             password     = password)
     
-        vm.add_doctor(new_doctor)
+        if vm.add_doctor(new_doctor):
+            return input("Success.\nEnter to return")
+        else:
+            return input("national id already exists.")
+    # login
+    elif opt == 2:
+        phone_number = input("Phone number: ")
+        doct = vm.get_doctor_by_phone_number(phone_number)
+        
+        if doct == None:
+            return input("Phone number was not found in the system.")
+        
+        password = input("Password: ")
+        
+        if password == doct.password:
+            return input("Logged in\nEnter to return")
+        
 
 def admin_panel():
     clear()
     print(
 '''
+Admins Panel
+
 1. See all doctors
 2. Find doctor by national ID
 3. Filter by Speciality
+4. Add supported City
+5. Add supported Speciality
 '''
     )
-    valid_options = [1, 2, 3]
+    valid_options = [1, 2, 3, 4, 5]
     opt = get_option(valid_options)
     
     # See all doctors
@@ -241,7 +287,7 @@ def admin_panel():
             except ValueError:
                 print("Invalid national ID")
         
-        doct = vm.get_by_national_id(national_id)
+        doct = vm.get_doctor_by_national_id(national_id)
         
         if doct == None:
             input("Doctor not found. \nEnter to return. ")
@@ -260,9 +306,10 @@ def admin_panel():
     # Find all doctors by specialty
     # {Get specialty} -> {Get Doctors from DS} -> {Show}
     elif opt == 3:
-        specialty = input("national id: ")
-        docts = vm.get_by_specialty(specialty)
+        specialty = input("Specialty: ")
+        docts = vm.get_doctor_by_specialty(specialty)
         curr_doc_node = docts.head
+
         if curr_doc_node == None:
             input("no doctors found. \nEnter to return. ")
         else:
@@ -283,17 +330,148 @@ def admin_panel():
             
             input("Enter to return.")
         return
-    # TODO: Add city support
+    
+    # Add city support
     # {Get City} -> {Add to DS}
+    elif opt == 4:
+        new_city = input("New City: ")
+        
+        #check if city already exists
+        curr_city = vm.get_all_cities().head
 
-    # TODO: Add speciality support  
+        while curr_city != None:
+            if curr_city.data == new_city:
+                return input("City is already supported.")
+            curr_city = curr_city.next
+
+        vm.add_city(new_city)
+        return
+    
+    # Add speciality support  
     # {Get speciality} -> {Add to DS}
+    elif opt == 5:
+        new_specialty = input("New specialty: ")
+        
+        #check if city already exists
+        curr_specialty = vm.get_all_speci().head
 
+        while curr_specialty != None:
+            if curr_specialty.data == new_specialty:
+                return input("specialty is already supported.\nEnter to return")
+            curr_specialty = curr_specialty.next
+
+        vm.add_specialty(new_specialty)
+        return
+    
 def patient_panel():
     clear()
-    print("This is the patient panel")
-    input("Enter to exit")
+    if curr_user != None:
+        print(f"User:{curr_user.name} {curr_user.family_name}")
+    print(
+'''
+Patients Panel
 
+1. register patient
+2. login
+3. Filter by Speciality
+4. Add supported City
+5. Add supported Speciality
+'''
+    )
+    valid_options = [1, 2, 3, 4, 5]
+    opt = get_option(valid_options)
+    
+    if opt == 1:
+        name         = input("name: ")
+        family_name  = input("family name: ")
+        
+        while True:
+            national_id = input("national id: ")
+            try:
+                national_id = int(national_id)
+                break
+            except ValueError:
+                print("Invalid national id.")
+        
+        while True:
+            phone_number = input("phone number: ")
+            try:
+                phone_number = int(phone_number)
+                break
+            except ValueError:
+                print("Invalid phone number.")
+        
+        password = input("password: ")
+
+        while True:
+            sex = input("sex (Male/Female): ")
+            if sex == "Male" or sex == "Female":
+                break
+            else:
+                print("Invalid sex (case sensitive)")
+
+        invalid_city = True
+        
+        while invalid_city:
+            patient_city = input("\ncity: ")
+            if patient_city == '0':
+                return
+            
+            curr_city = vm.get_all_cities().head
+            while curr_city != None:
+                if curr_city.data == patient_city:
+                    invalid_city = False
+                    break
+                curr_city = curr_city.next
+            
+            if not invalid_city:
+                break
+
+            print(f"{patient_city} is not a supported city\nSupported Cities:")
+            curr_city = vm.get_all_cities().head
+            while curr_city != None:
+                print(curr_city.data, end=",")
+                curr_city = curr_city.next
+        
+        while True:
+            insurance_number = input("insurance number: ")
+            try:
+                insurance_number = int(insurance_number)
+                break
+            except ValueError:
+                print("Invalid insurance number.")
+         
+
+        new_patient = pat(
+            name         = name,
+            family_name  = family_name,
+            national_id  = national_id,
+            phone_number = phone_number,
+            password     = password,
+            sex          = sex,
+            city         = patient_city)
+    
+        if vm.add_patient(new_patient):
+            return input("Success.\nEnter to return")
+        else:
+            return input("National id already exists.\nEnter to return")
+        
+    # login
+    elif opt == 2:
+        phone_number = input("Phone number: ")
+        patient = vm.get_patient_by_phone_number(phone_number)
+        
+        if patient == None:
+            return input("Phone number was not found in the system.")
+        
+        password = input("Password: ")
+        
+        if password == patient.password:
+            curr_user = patient
+            return input("Logged in\nEnter to return")
+    
+        
+    
 def get_option(valid_options: list):
     while True:
         try: 

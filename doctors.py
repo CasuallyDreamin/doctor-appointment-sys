@@ -7,12 +7,14 @@ class doctors:
     def __init__(self):
         self.count = 0
         self.doctors = ht()
+        self.doctors_by_number = ht()
         self.specialty_order = parent_child_ll()
         self.city_order = parent_child_ll()
 
     def add_doctor(self, doct: doctor) -> bool:
         if not self.doctors.insert(doct.national_id, doct):
             return False
+        self.doctors_by_number.insert(doct.phone_number, doct)
         self.specialty_order.add_child(doct.specialty, doct)
         self.city_order.add_child(doct.city, doct)
         return True
@@ -28,7 +30,10 @@ class doctors:
 
     def get_by_national_id(self, national_id: int) -> doctor:
         return self.doctors.get(national_id)
-
+    
+    def get_by_phone_number(self, phone_number: int) -> doctor:
+        return self.doctors_by_number.get(phone_number)
+    
     def get_all_by_specialty(self, specialty: str) -> sll:
         return self.specialty_order.get_children(specialty)
     
