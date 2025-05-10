@@ -1,0 +1,20 @@
+Cardiology
+Dermatology
+Endocrinology
+Gastroenterology
+Hematology
+Immunology
+Infectious Disease
+Nephrology
+Neurology
+Oncology
+Ophthalmology
+Orthopedics
+Otolaryngology
+Pediatrics
+Psychiatry
+Pulmonology
+Rheumatology
+Urology
+Geriatrics
+General Surgeon

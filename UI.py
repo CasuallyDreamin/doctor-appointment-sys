@@ -11,9 +11,9 @@ with open("data_files/Cities.txt","r") as f:
         vm.add_city(city)
 
 with open("data_files/Specialties.txt", "r") as f:
-    specis = [line.strip() for line in f.readlines()]
-    for speci in specis:
-        vm.add_specialty(speci)
+    specialties = [line.strip() for line in f.readlines()]
+    for specialty in specialties:
+        vm.add_specialty(specialty)
 
 with open("data_files/Doctors.txt","r") as f:
     for line in f:
@@ -58,7 +58,37 @@ def main_menu():
     if opt == 1: doctor_panel()
     elif opt == 2: admin_panel()
     elif opt == 3: patient_panel()
-    elif opt == 0: return False
+    elif opt == 0: 
+        with open("data_files/Cities.txt","w") as f:
+            cities = vm.get_all_cities()
+            curr_city = cities.head
+            
+            while curr_city != None:
+                f.write(f"{curr_city.data}\n")
+                curr_city = curr_city.next
+
+        with open("data_files/Specialties.txt", "w") as f:
+            specialties = vm.get_all_speci()
+            curr_speci = specialties.head
+
+            while curr_speci != None:
+                f.write(f"{curr_speci.data}\n")
+                curr_speci = curr_speci.next
+
+
+        with open("data_files/Doctors.txt","w") as f:
+            doctors = vm.get_all_doctors()
+            curr_doctor = doctors.head
+
+            while curr_doctor != None:
+                curr_data:doctor = curr_doctor.data
+                
+                curr_doctor_info_write_formated = curr_data.name + "-" + curr_data.family_name + "-" + str(curr_data.national_id) + "-" + str(curr_data.med_id) + "-" + str(curr_data.phone_number) + "-" + curr_data.address + "-" + curr_data.city + "-" + curr_data.specialty + "-" + curr_data.password
+
+                f.write(f"{curr_doctor_info_write_formated}\n")
+                curr_doctor = curr_doctor.next
+
+        return False
     return True
 
 def doctor_panel():
@@ -106,7 +136,7 @@ def doctor_panel():
         invalid_city = True
         
         while invalid_city:
-            doc_city = input("city: ")
+            doc_city = input("\ncity: ")
             if doc_city == '0':
                 return
             
@@ -123,12 +153,12 @@ def doctor_panel():
             print(f"{doc_city} is not a supported city\nSupported Cities:")
             curr_city = vm.get_all_cities().head
             while curr_city != None:
-                print(curr_city.data)
+                print(curr_city.data, end=",")
                 curr_city = curr_city.next
 
         invalid_speci = True
         while invalid_speci:
-            doc_specialty = input("specialty: ")
+            doc_specialty = input("\nspecialty: ")
             if doc_specialty == '0':
                 return
             
@@ -145,10 +175,10 @@ def doctor_panel():
             print(f"{doc_specialty} is not a supported specialty\nSupported Specialties:")
             curr_speci = vm.get_all_speci().head
             while curr_speci != None:
-                print(curr_speci.data)
+                print(curr_speci.data, end=",")
                 curr_speci = curr_speci.next
         
-        password = input("password")
+        password = input("password: ")
 
         new_doctor = doctor(
             name         = name,
