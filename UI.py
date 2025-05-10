@@ -4,56 +4,10 @@ from data_objects.doctor import doctor
 from data_objects.patient import patient as pat
 from view_model import view_model
 
-vm = view_model()
-curr_user = None
-
-with open("data_files/Cities.txt","r") as f:
-    cities = [line.strip() for line in f.readlines()]
-    for city in cities:
-        vm.add_city(city)
-
-with open("data_files/Specialties.txt", "r") as f:
-    specialties = [line.strip() for line in f.readlines()]
-    for specialty in specialties:
-        vm.add_specialty(specialty)
-
-with open("data_files/Doctors.txt","r") as f:
-    for line in f:
-        doc = line.strip().split("-")
-        new_doctor = doctor(
-        name         = doc[0],
-        family_name  = doc[1],
-        national_id  = int(doc[2]),
-        med_id       = int(doc[3]),
-        phone_number = int(doc[4]),
-        address      = doc[5],
-        city         = doc[6],
-        specialty    = doc[7],
-        password     = doc[8])
-    
-        if not vm.add_doctor(new_doctor):
-            exit("couldn't add a doctor")   
-
-with open("data_files/Patients.txt","r") as f:
-    for line in f:
-        patient = line.strip().split("-")
-        new_patient = pat(
-        name             = patient[0],
-        family_name      = patient[1],
-        national_id      = int(patient[2]),
-        phone_number     = int(patient[3]),
-        password         = patient[4],
-        sex              = patient[5],
-        city             = patient[6],
-        insurance_number = patient[7])
-    
-        if not vm.add_patient(new_patient):
-            exit("couldn't add a patient")   
-
 
 def UI():
     running = True
-
+    init()
     while running:
         running = main_menu()
     
@@ -62,8 +16,8 @@ def UI():
 
 def main_menu():
     clear()
-    if curr_user != None:
-        print(f"User:{curr_user.name} {curr_user.family_name}")
+    if vm.curr_user != None:
+        print(f"User:{vm.curr_user.name} {vm.curr_user.family_name}")
     print(
     """
 1. doctor panel
@@ -78,7 +32,6 @@ def main_menu():
     elif opt == 2: admin_panel()
     elif opt == 3: patient_panel()
     elif opt == 0: 
-
         #Update data files before exit
         with open("data_files/Cities.txt","w") as f:
             cities = vm.get_all_cities()
@@ -114,17 +67,18 @@ def main_menu():
 def doctor_panel():
     clear()
     
-    if curr_user != None:
-        print(f"User:{curr_user.name} {curr_user.family_name}")
+    if vm.curr_user != None:
+        print(f"User:{vm.curr_user.name} {vm.curr_user.family_name}")
     print(
 '''
 Doctors Panel
 
 1. register doctor
 2. login
+0. return
 '''
     )
-    valid_options = [1, 2]
+    valid_options = [1, 2, 0]
     opt = get_option(valid_options)
     
     # register doctor
@@ -223,7 +177,10 @@ Doctors Panel
             return input("national id already exists.")
     # login
     elif opt == 2:
-        phone_number = input("Phone number: ")
+        try:
+            phone_number = int(input("Phone number: "))
+        except ValueError: return input("invalid phone number")
+
         doct = vm.get_doctor_by_phone_number(phone_number)
         
         if doct == None:
@@ -232,9 +189,13 @@ Doctors Panel
         password = input("Password: ")
         
         if password == doct.password:
+            vm.curr_user = doct
             return input("Logged in\nEnter to return")
         
+        else: return input("Wrong password")
 
+    elif opt == 0: return
+        
 def admin_panel():
     clear()
     print(
@@ -246,9 +207,10 @@ Admins Panel
 3. Filter by Speciality
 4. Add supported City
 5. Add supported Speciality
+0. return
 '''
     )
-    valid_options = [1, 2, 3, 4, 5]
+    valid_options = [1, 2, 3, 4, 5, 0]
     opt = get_option(valid_options)
     
     # See all doctors
@@ -363,10 +325,12 @@ Admins Panel
         vm.add_specialty(new_specialty)
         return
     
+    elif opt == 0: return
+    
 def patient_panel():
     clear()
-    if curr_user != None:
-        print(f"User:{curr_user.name} {curr_user.family_name}")
+    if vm.curr_user != None:
+        print(f"User:{vm.curr_user.name} {vm.curr_user.family_name}")
     print(
 '''
 Patients Panel
@@ -376,9 +340,11 @@ Patients Panel
 3. Filter by Speciality
 4. Add supported City
 5. Add supported Speciality
+0. return
 '''
     )
-    valid_options = [1, 2, 3, 4, 5]
+    valid_options = [1, 2, 3, 4, 5, 0]
+    
     opt = get_option(valid_options)
     
     if opt == 1:
@@ -467,10 +433,12 @@ Patients Panel
         password = input("Password: ")
         
         if password == patient.password:
-            curr_user = patient
+            vm.curr_user = patient
             return input("Logged in\nEnter to return")
-    
         
+        else: return input("Wrong password.")    
+    
+    elif opt == 0: return
     
 def get_option(valid_options: list):
     while True:
@@ -481,6 +449,53 @@ def get_option(valid_options: list):
             print("Invalid option")
             input()
     return opt
+
+def init():
+    global vm 
+    vm = view_model()
     
+    with open("data_files/Cities.txt","r") as f:
+        cities = [line.strip() for line in f.readlines()]
+        for city in cities:
+            vm.add_city(city)
+
+    with open("data_files/Specialties.txt", "r") as f:
+        specialties = [line.strip() for line in f.readlines()]
+        for specialty in specialties:
+            vm.add_specialty(specialty)
+
+    with open("data_files/Doctors.txt","r") as f:
+        for line in f:
+            doc = line.strip().split("-")
+            new_doctor = doctor(
+            name         = doc[0],
+            family_name  = doc[1],
+            national_id  = int(doc[2]),
+            med_id       = int(doc[3]),
+            phone_number = int(doc[4]),
+            address      = doc[5],
+            city         = doc[6],
+            specialty    = doc[7],
+            password     = doc[8])
+        
+            if not vm.add_doctor(new_doctor):
+                exit("couldn't add a doctor")   
+
+    with open("data_files/Patients.txt","r") as f:
+        for line in f:
+            patient = line.strip().split("-")
+            new_patient = pat(
+            name             = patient[0],
+            family_name      = patient[1],
+            national_id      = int(patient[2]),
+            phone_number     = int(patient[3]),
+            password         = patient[4],
+            sex              = patient[5],
+            city             = patient[6],
+            insurance_number = patient[7])
+        
+            if not vm.add_patient(new_patient):
+                exit("couldn't add a patient")   
+
 if __name__ == "__main__":
-    main_menu()
+    UI()

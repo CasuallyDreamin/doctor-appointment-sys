@@ -5,6 +5,7 @@ from data_objects.patient import patient
 
 class view_model:
     def __init__(self):
+        self.curr_user: doctor | patient = None
         self.doctors = doctors()
         self.patients = patients()
     
