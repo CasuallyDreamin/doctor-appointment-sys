@@ -4,6 +4,14 @@ a platform to book and manage doctor appointments
 run the main.py file with python
 $ python3 main.py $
 
+# Note:
+    No duplicate data is made when adding data objects to data structures
+
+    the only extra space used when adding to multiple
+    data structrures is pointer space
+
+    Given deletion is not a required operation, security concerns of hanging pointers are unfounded.
+
 # data structures
 ## parent-child linked list:
     a main linked list of parent nodes

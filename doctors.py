@@ -5,7 +5,6 @@ from data_structures.parent_child_ll import parent_child_ll
 
 class doctors:
     def __init__(self):
-        self.count = 0
         self.doctors = ht()
         self.doctors_by_number = ht()
         self.specialty_order = parent_child_ll()
